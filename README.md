@@ -1,10 +1,10 @@
 # GM-Label-Tool
 The tool for label General Movements(GM) videos
 
-## Need to install
+
+## Git Clone in your computers
 ```
-pip install pyqt5
-pip install opencv-python
+git clone https://github.com/MioYeh/GM-Label-Tool.git
 ```
 ## Use Anaconda env
 ```
@@ -13,14 +13,16 @@ conda env create --file GM_label.yml --name GM_label
 #if create success
 conda activate GM_label
 ```
-## Git Clone in your computers
+
+## Not use env need to install
 ```
-git clone https://github.com/MioYeh/GM-Label-Tool.git
+pip install pyqt5
+pip install opencv-python
 ```
 
-## Run
+
+## Run Code
 ```
-cd GM-Label-Tool
 python main.py
 ```
 
