@@ -80,16 +80,19 @@ class Ui_MainWindow(object):
         '''END Time label'''
         
         '''All check time'''
+        self.cry_label = QtWidgets.QLabel(self.centralwidget)
+        self.cry_label.setGeometry(QtCore.QRect(40, 500, 150, 200))
+        
         self.all_time_label = QtWidgets.QLabel(self.centralwidget)
         self.all_time_label.setWordWrap(True)
         
         self.scroll_area = QtWidgets.QScrollArea(self.centralwidget)
-        self.scroll_area.setGeometry(QtCore.QRect(40, 650, 150, 200))
+        self.scroll_area.setGeometry(QtCore.QRect(40, 610, 150, 200))
         self.scroll_area.setWidgetResizable(True)  # 讓 QLabel 隨著內容增長
         self.scroll_area.setWidget(self.all_time_label)
 
         self.delete_button = QtWidgets.QPushButton(self.centralwidget)
-        self.delete_button.setGeometry(QtCore.QRect(40, 855, 150, 32))
+        self.delete_button.setGeometry(QtCore.QRect(40, 815, 150, 32))
         '''END All check time'''
         
         '''Output bottom'''
@@ -118,8 +121,8 @@ class Ui_MainWindow(object):
         self.time_label.setText(_translate("MainWindow", "紀錄時間：--:--:--"))
         self.all_time_label.setText(_translate("MainWindow", ""))
         self.delete_button.setText(_translate("MainWindow", "刪除最後一行"))
-        self.output_button.setText(_translate("MainWindow", "輸出JOSN"))
-        
+        self.output_button.setText(_translate("MainWindow", "輸出JSON"))
+        self.cry_label.setText(_translate("MainWindow", "Cry"))
         
 if __name__ == "__main__":
     import sys
