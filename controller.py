@@ -26,7 +26,8 @@ class MainWindow_controller(QMainWindow):
         self.ui.list_view.itemClicked.connect(self.play_video)
         self.ui.delete_button.clicked.connect(self.delete_last_line)
         self.ui.output_button.clicked.connect(self.save_to_json)
-        
+        self.ui.selectSaveLocationButton.clicked.connect(self.selectSaveLocation)
+
     def open_file(self):
         print(self.ui.all_time_label.pixmap())
         print(self.ui.all_time_label.text())
@@ -91,12 +92,25 @@ class MainWindow_controller(QMainWindow):
         if len(lines) > 1:  # 避免刪到最後一行
             lines.pop()  # 刪除最後一行
             self.ui.all_time_label.setText("\n".join(lines))  # 重新組合成文字
-
+    
+    def selectSaveLocation(self):
+        folderPath = QFileDialog.getExistingDirectory(self, "選擇儲存位置")
+        if folderPath:
+            self.ui.saveFolderPath.setText(folderPath)  # 儲存選擇的資料夾路徑
+            # print(f"選擇的儲存位置：{self.ui.saveFolderPath}")  # 在控制台顯示路徑
+            
     def save_to_json(self):
+        if  self.ui.saveFolderPath.text() == "":
+            reply = QtWidgets.QMessageBox.question(self, "警告", "請先選擇輸出位置",
+                                        QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.No)
+            if reply == QtWidgets.QMessageBox.No:
+                return
+            
         if len(self.ui.all_time_label.text()) != 0:
-            options = QFileDialog.Options()
+            # options = QFileDialog.Options()
             file_name = os.path.basename(self.video_path).split(".")[0] + "_label.json"
-            file_path, _ = QFileDialog.getSaveFileName(self, "儲存檔案", file_name, "JSON Files (*.json)", options=options)
+            # file_path, _ = QFileDialog.getSaveFileName(self, "儲存檔案", file_name, "JSON Files (*.json)", options=options)
+            file_path = os.path.join(self.ui.saveFolderPath.text(), file_name)
             all_timer = []
             for i in self.ui.all_time_label.text().split("\n")[1:] :
                 timer = []

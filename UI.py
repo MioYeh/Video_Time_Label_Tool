@@ -78,15 +78,21 @@ class Ui_MainWindow(object):
         self.all_time_label.setWordWrap(True)
         
         self.scroll_area = QtWidgets.QScrollArea(self.centralwidget)
-        self.scroll_area.setGeometry(QtCore.QRect(40, 610, 150, 200))
+        self.scroll_area.setGeometry(QtCore.QRect(40, 610, 150, 150)) #200
         self.scroll_area.setWidgetResizable(True)  # 讓 QLabel 隨著內容增長
         self.scroll_area.setWidget(self.all_time_label)
 
         self.delete_button = QtWidgets.QPushButton(self.centralwidget)
-        self.delete_button.setGeometry(QtCore.QRect(40, 815, 150, 32))
+        self.delete_button.setGeometry(QtCore.QRect(40, 765, 150, 32))
         '''END All check time'''
         
         '''Output bottom'''
+        self.selectSaveLocationButton = QtWidgets.QPushButton(self.centralwidget)
+        # self.selectSaveLocationButton.clicked.connect(self.selectSaveLocation)
+        self.selectSaveLocationButton.setGeometry(QtCore.QRect(40, 15, 150, 30))
+        self.saveFolderPath = QtWidgets.QLabel(self.centralwidget)
+        self.saveFolderPath.setGeometry(QtCore.QRect(200, 15, 150, 30))
+
         self.output_button = QtWidgets.QPushButton(self.centralwidget)
         self.output_button.setGeometry(QtCore.QRect(850, 475, 150, 30))
         '''END Output bottom'''
@@ -112,9 +118,11 @@ class Ui_MainWindow(object):
         self.time_label.setText(_translate("MainWindow", "紀錄時間：--:--:--"))
         self.all_time_label.setText(_translate("MainWindow", ""))
         self.delete_button.setText(_translate("MainWindow", "刪除最後一行"))
-        self.output_button.setText(_translate("MainWindow", "輸出JSON"))
-        self.cry_label.setText(_translate("MainWindow", "Cry"))
-        
+        self.output_button.setText(_translate("MainWindow", "存檔"))
+        self.cry_label.setText(_translate("MainWindow", "標註Cry，按下C開始記錄"))
+        self.selectSaveLocationButton.setText(_translate("MainWindow", "選擇儲存位置"))
+        self.saveFolderPath.setText(_translate("MainWindow", ""))
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
