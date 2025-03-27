@@ -36,15 +36,11 @@ class VideoPlayer(QWidget):
         self.paused = True
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.nextFrame)
-
         self.recording = False
         self.start_time = None
         self.start_times = {"C": None, "W": None, "R": None}
-
         self.screen = QApplication.desktop()
-        width = self.screen.width()
-        height = self.screen.height()
-        print(width, height)
+
 
     def initUI(self):
         self.screen = QApplication.desktop()
@@ -96,20 +92,34 @@ class VideoPlayer(QWidget):
         self.list_widget.itemClicked.connect(self.loadSelectedVideo)
 
         # -----設定不同紀錄框和刪除按鈕-----
+        self.record_c_label = QLabel("Time:")
+        self.record_w_label = QLabel("Time:")
+        self.record_r_label = QLabel("Time:")
+        # self.record_r_label = QLabel("Time:")
+        # self.record_r_label = QLabel("Time:")
+        
         self.record_c_list = QListWidget()
         self.record_w_list = QListWidget()
         self.record_r_list = QListWidget()
-
+        # self.record_r_list = QListWidget()
+        # self.record_r_list = QListWidget()
+        
         self.record_c_list.setSelectionMode(QListWidget.SingleSelection)
         self.record_w_list.setSelectionMode(QListWidget.SingleSelection)
         self.record_r_list.setSelectionMode(QListWidget.SingleSelection)
-
+        # self.record_r_list.setSelectionMode(QListWidget.SingleSelection)
+        # self.record_r_list.setSelectionMode(QListWidget.SingleSelection)
+                
         self.delete_c_record_btn = QPushButton("Delete Record", self)
         self.delete_c_record_btn.clicked.connect(self.delete_c_selected_record)
         self.delete_w_record_btn = QPushButton("Delete Record", self)
         self.delete_w_record_btn.clicked.connect(self.delete_w_selected_record)
         self.delete_r_record_btn = QPushButton("Delete Record", self)
         self.delete_r_record_btn.clicked.connect(self.delete_r_selected_record)
+        # self.delete_r_record_btn = QPushButton("Delete Record", self)
+        # self.delete_r_record_btn.clicked.connect(self.delete_r_selected_record)
+        # self.delete_r_record_btn = QPushButton("Delete Record", self)
+        # self.delete_r_record_btn.clicked.connect(self.delete_r_selected_record)
         # ---------------------------------
 
         self.record_area = QTextEdit()
@@ -149,22 +159,39 @@ class VideoPlayer(QWidget):
 
         down_layout_list_1 = QVBoxLayout()
         down_layout_list_1.addWidget(QLabel("C Records:"))
+        down_layout_list_1.addWidget(self.record_c_label)
         down_layout_list_1.addWidget(self.record_c_list)
         down_layout_list_1.addWidget(self.delete_c_record_btn)
 
         down_layout_list_2 = QVBoxLayout()
         down_layout_list_2.addWidget(QLabel("W Records:"))
+        down_layout_list_2.addWidget(self.record_w_label)
         down_layout_list_2.addWidget(self.record_w_list)
         down_layout_list_2.addWidget(self.delete_w_record_btn)
 
         down_layout_list_3 = QVBoxLayout()
         down_layout_list_3.addWidget(QLabel("R Records:"))
+        down_layout_list_3.addWidget(self.record_r_label)
         down_layout_list_3.addWidget(self.record_r_list)
         down_layout_list_3.addWidget(self.delete_r_record_btn)
 
+        # down_layout_list_3 = QVBoxLayout()
+        # down_layout_list_3.addWidget(QLabel("R Records:"))
+        # down_layout_list_3.addWidget(self.record_r_label)
+        # down_layout_list_3.addWidget(self.record_r_list)
+        # down_layout_list_3.addWidget(self.delete_r_record_btn)
+
+        # down_layout_list_3 = QVBoxLayout()
+        # down_layout_list_3.addWidget(QLabel("R Records:"))
+        # down_layout_list_3.addWidget(self.record_r_label)
+        # down_layout_list_3.addWidget(self.record_r_list)
+        # down_layout_list_3.addWidget(self.delete_r_record_btn)
+        
         down_layout.addLayout(down_layout_list_1)
         down_layout.addLayout(down_layout_list_2)
         down_layout.addLayout(down_layout_list_3)
+        # down_layout.addLayout(down_layout_list_3)
+        # down_layout.addLayout(down_layout_list_3)
         main_down_layout.addLayout(down_layout)
 
         left_layout.addLayout(main_down_layout)
@@ -297,13 +324,23 @@ class VideoPlayer(QWidget):
             self.cap.set(cv2.CAP_PROP_POS_FRAMES, position)
 
     def keyPressEvent(self, event):
-        print(event.key())
-        if event.key() == Qt.Key_C and self.video_path:
-            self.controller.handle_key("C")
-        elif event.key() == Qt.Key_W and self.video_path:
-            self.controller.handle_key("W")
-        elif event.key() == Qt.Key_R and self.video_path:
-            self.controller.handle_key("R")
+        if self.video_path:
+            current_time = self.cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
+            formatted_time = time.strftime('%M:%S', time.gmtime(current_time))
+            # print(formatted_time == "00:00")
+            if event.key() == Qt.Key_C and formatted_time != "00:00":
+                self.record_c_label.setText(f"Time: {formatted_time}")
+                self.controller.handle_key("C")
+                
+            elif event.key() == Qt.Key_W and formatted_time != "00:00":
+                self.record_w_label.setText(f"Time: {formatted_time}")
+                self.controller.handle_key("W")
+                
+                
+            elif event.key() == Qt.Key_R and formatted_time != "00:00":
+                self.record_r_label.setText(f"Time: {formatted_time}")
+                self.controller.handle_key("R")
+                
 
     def clear_records(self):
         self.record_c_list.clear()
