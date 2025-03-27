@@ -32,3 +32,6 @@ pip install opencv-python
 python main.py
 ```
 
+## How to Use
+#### open file
+  打開影片檔案
