@@ -26,5 +26,3 @@ pip install opencv-python
 python main.py
 ```
 
-
-Reference: https://www.wongwonggoods.com/
