@@ -14,6 +14,15 @@ conda env create --file GM_label.yml --name GM_label
 conda activate GM_label
 ```
 
+```
+
+conda create --name video_label python=3.8
+conda activate video_label
+pip install pyqt5
+pip install opencv-python
+
+```
+
 ## Not use env need to install
 ```
 pip install pyqt5
