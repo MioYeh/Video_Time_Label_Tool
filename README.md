@@ -8,13 +8,6 @@ git clone https://github.com/MioYeh/GM-Label-Tool.git
 ```
 ## Use Anaconda env
 ```
-conda env create --file GM_label.yml --name GM_label
-
-#if create success
-conda activate GM_label
-```
-
-```
 
 conda create --name video_label python=3.8
 conda activate video_label
