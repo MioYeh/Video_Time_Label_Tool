@@ -32,7 +32,7 @@ class VideoPlayer(QWidget):
         self.video_width = 960
         self.video_height = 720
         self.setWindowTitle("Video Player")
-        self.setGeometry(100, 100, 1100, 800)
+        self.setGeometry(100, 100, self.video_width+150, self.video_height+80)
         # print(self.video_width, self.video_height)
         
         self.video_label = QLabel(self)
@@ -147,7 +147,7 @@ class VideoPlayer(QWidget):
         left_layout.addLayout(main_down_layout) 
         main_layout.addLayout(left_layout)
         main_layout.addLayout(right_layout)
-        
+        self.setFocusPolicy(Qt.StrongFocus)
         self.setLayout(main_layout)
         
     def openFile(self):
