@@ -35,10 +35,17 @@ python main.py
 ![image](https://github.com/MioYeh/GM-Label-Tool/blob/main/label_ui.png)
 
 `讀取紀錄`
+
 `輸出紀錄`
+
 `Open file` 代表
+
 `Open floder` 
+
 `Play`
+
 `Pause`
+
 `Stop`
+
 `Record method`: Pressing 'C' will record the start time. Pressing it again will display the time range from start to end in the log, for example: '00:10 - 00:20'
