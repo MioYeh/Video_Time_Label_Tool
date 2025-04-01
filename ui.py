@@ -197,7 +197,7 @@ class VideoPlayer(QWidget):
         left_layout.addLayout(main_down_layout)
         main_layout.addLayout(left_layout)
         main_layout.addLayout(right_layout)
-
+        self.setFocusPolicy(Qt.StrongFocus)
         self.setLayout(main_layout)
 
     def openFile(self):
