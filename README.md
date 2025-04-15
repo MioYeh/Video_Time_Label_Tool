@@ -1,6 +1,7 @@
 # Video Time Label Tool
 
-#### 🎉 2025.04.15 update new button, and change ui setup
+#### 🎉 2025.04 video time label tool online.
+#### 🎉 2025.04.15 update new button, and change ui setup.
 
 ## Git Clone in your computers
 ```
