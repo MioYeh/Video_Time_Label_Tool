@@ -437,7 +437,7 @@ class VideoPlayer(QWidget):
         file_path = os.path.splitext(self.video_path)[0] + ".json"
         records = {
             "video_path": self.video_path,
-            "version": "1.0",
+            "version": "1.0.2",
             "C": [
                 self.record_c_list.item(i).text()
                 for i in range(self.record_c_list.count())
