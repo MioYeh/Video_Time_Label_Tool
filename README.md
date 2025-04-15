@@ -1,5 +1,7 @@
 # Video Time Label Tool
 
+#### 🎉 2025.04.15 update new button, and change ui setup
+
 ## Git Clone in your computers
 ```
 git clone https://github.com/MioYeh/GM-Label-Tool.git
