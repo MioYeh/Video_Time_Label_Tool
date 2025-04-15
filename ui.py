@@ -36,11 +36,15 @@ class VideoPlayer(QWidget):
         self.paused = True
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.nextFrame)
+        self.playback_rate = 1.0
+        self.start_name = "pause"
+
         self.recording = False
         self.start_time = None
         self.start_times = {"C": None, "W": None, "R": None}
         self.screen = QApplication.desktop()
-
+        screen_width = self.screen.width()
+        screen_height = self.screen.height()
 
     def initUI(self):
         self.screen = QApplication.desktop()
@@ -57,6 +61,7 @@ class VideoPlayer(QWidget):
         self.video_label = QLabel(self)
         self.video_label.setStyleSheet("background-color: black;")
         self.video_label.setFixedSize(self.video_width, self.video_height)
+
         self.video_path_label = QLabel("Video Path: No video selected")
         self.label_path_label = QLabel("Label Path: No label selected")
         self.video_path_label.setWordWrap(True)
@@ -70,6 +75,15 @@ class VideoPlayer(QWidget):
 
         self.stop_button = QPushButton("Stop", self)
         self.stop_button.clicked.connect(self.stop_video)
+
+        self.faster_btn = QPushButton("Faster")
+        self.faster_btn.clicked.connect(self.speed_up)
+
+        self.normal_btn = QPushButton("Normal")
+        self.normal_btn.clicked.connect(self.original_speed)
+
+        self.slower_btn = QPushButton("Slower")
+        self.slower_btn.clicked.connect(self.slow_down)
 
         self.open_button = QPushButton("Open File", self)
         self.open_button.clicked.connect(self.openFile)
@@ -95,31 +109,21 @@ class VideoPlayer(QWidget):
         self.record_c_label = QLabel("Time:")
         self.record_w_label = QLabel("Time:")
         self.record_r_label = QLabel("Time:")
-        # self.record_r_label = QLabel("Time:")
-        # self.record_r_label = QLabel("Time:")
-        
+
         self.record_c_list = QListWidget()
         self.record_w_list = QListWidget()
         self.record_r_list = QListWidget()
-        # self.record_r_list = QListWidget()
-        # self.record_r_list = QListWidget()
-        
+
         self.record_c_list.setSelectionMode(QListWidget.SingleSelection)
         self.record_w_list.setSelectionMode(QListWidget.SingleSelection)
         self.record_r_list.setSelectionMode(QListWidget.SingleSelection)
-        # self.record_r_list.setSelectionMode(QListWidget.SingleSelection)
-        # self.record_r_list.setSelectionMode(QListWidget.SingleSelection)
-                
+
         self.delete_c_record_btn = QPushButton("Delete Record", self)
         self.delete_c_record_btn.clicked.connect(self.delete_c_selected_record)
         self.delete_w_record_btn = QPushButton("Delete Record", self)
         self.delete_w_record_btn.clicked.connect(self.delete_w_selected_record)
         self.delete_r_record_btn = QPushButton("Delete Record", self)
         self.delete_r_record_btn.clicked.connect(self.delete_r_selected_record)
-        # self.delete_r_record_btn = QPushButton("Delete Record", self)
-        # self.delete_r_record_btn.clicked.connect(self.delete_r_selected_record)
-        # self.delete_r_record_btn = QPushButton("Delete Record", self)
-        # self.delete_r_record_btn.clicked.connect(self.delete_r_selected_record)
         # ---------------------------------
 
         self.record_area = QTextEdit()
@@ -129,32 +133,44 @@ class VideoPlayer(QWidget):
         self.record_scroll.setWidget(self.record_area)
 
         # 版面配置
-        controls_layout = QHBoxLayout()
-        controls_layout.addWidget(self.open_button)
-        controls_layout.addWidget(self.folder_button)
-        controls_layout.addWidget(self.play_button)
-        controls_layout.addWidget(self.pause_button)
-        controls_layout.addWidget(self.stop_button)
-        controls_layout.addWidget(self.slider)
-        controls_layout.addWidget(self.time_label)
-
         save_layout = QHBoxLayout()
+        save_layout.addWidget(self.open_button)
+        save_layout.addWidget(self.folder_button)
         save_layout.addWidget(self.load_btn)
         save_layout.addWidget(self.save_btn)
 
-        main_layout = QHBoxLayout()
+        slider_layout = QHBoxLayout()
+        slider_layout.addWidget(self.slider)
+        slider_layout.addWidget(self.time_label)
+
+        controls_layout = QHBoxLayout()
+        controls_layout.addWidget(self.play_button)
+        controls_layout.addWidget(self.pause_button)
+        controls_layout.addWidget(self.stop_button)
+        controls_layout.addWidget(self.slower_btn)
+        controls_layout.addWidget(self.normal_btn)
+        controls_layout.addWidget(self.faster_btn)
+
+        path_layout = QVBoxLayout()
+        path_layout.addWidget(self.video_path_label)
+        path_layout.addWidget(self.label_path_label)
+
+        list_layout = QVBoxLayout()
+        list_layout.addWidget(QLabel("Video List"))
+        list_layout.addWidget(self.list_widget)
+
+        list_path_layout = QHBoxLayout()
+        list_path_layout.addLayout(list_layout)
+        list_path_layout.addWidget(self.video_label)
+
         left_layout = QVBoxLayout()
-        left_layout.addWidget(self.video_label)
+        left_layout.addLayout(list_path_layout)
+        left_layout.addLayout(path_layout)
         left_layout.addLayout(save_layout)
+        left_layout.addLayout(slider_layout)
         left_layout.addLayout(controls_layout)
-        left_layout.addWidget(self.video_path_label)
-        left_layout.addWidget(self.label_path_label)
 
-        right_layout = QVBoxLayout()
-        right_layout.addWidget(QLabel("Video List"))
-        right_layout.addWidget(self.list_widget)
-
-        main_down_layout = QVBoxLayout()
+        # ------------reocrd list------------
         down_layout = QHBoxLayout()
 
         down_layout_list_1 = QVBoxLayout()
@@ -175,28 +191,14 @@ class VideoPlayer(QWidget):
         down_layout_list_3.addWidget(self.record_r_list)
         down_layout_list_3.addWidget(self.delete_r_record_btn)
 
-        # down_layout_list_3 = QVBoxLayout()
-        # down_layout_list_3.addWidget(QLabel("R Records:"))
-        # down_layout_list_3.addWidget(self.record_r_label)
-        # down_layout_list_3.addWidget(self.record_r_list)
-        # down_layout_list_3.addWidget(self.delete_r_record_btn)
-
-        # down_layout_list_3 = QVBoxLayout()
-        # down_layout_list_3.addWidget(QLabel("R Records:"))
-        # down_layout_list_3.addWidget(self.record_r_label)
-        # down_layout_list_3.addWidget(self.record_r_list)
-        # down_layout_list_3.addWidget(self.delete_r_record_btn)
-        
         down_layout.addLayout(down_layout_list_1)
         down_layout.addLayout(down_layout_list_2)
         down_layout.addLayout(down_layout_list_3)
-        # down_layout.addLayout(down_layout_list_3)
-        # down_layout.addLayout(down_layout_list_3)
-        main_down_layout.addLayout(down_layout)
+        # -----------------------------------
 
-        left_layout.addLayout(main_down_layout)
+        main_layout = QHBoxLayout()
         main_layout.addLayout(left_layout)
-        main_layout.addLayout(right_layout)
+        main_layout.addLayout(down_layout)
         self.setFocusPolicy(Qt.StrongFocus)
         self.setLayout(main_layout)
 
@@ -323,24 +325,90 @@ class VideoPlayer(QWidget):
         if self.cap:
             self.cap.set(cv2.CAP_PROP_POS_FRAMES, position)
 
+    def update_timer_interval(self):
+        delay = max(1, int(1000 / (self.frame_rate * self.playback_rate)))
+        self.timer.setInterval(delay)
+
+    def speed_up(self):
+        self.playback_rate = min(4.0, self.playback_rate + 0.25)
+        self.update_timer_interval()
+
+    def original_speed(self):
+        self.playback_rate = 1.0
+        self.update_timer_interval()
+
+    def slow_down(self):
+        self.playback_rate = max(0.25, self.playback_rate - 0.25)
+        self.update_timer_interval()
+
+    def seek_relative(self, seconds):
+        if self.cap and self.cap.isOpened():
+            current_time_ms = self.cap.get(cv2.CAP_PROP_POS_MSEC)
+            new_time_ms = max(0, current_time_ms + seconds * 1000)
+            self.cap.set(cv2.CAP_PROP_POS_MSEC, new_time_ms)
+            # print(f"跳轉至：{new_time_ms / 1000:.2f} 秒")
+
+            # 播放前先讀出該時間點畫面顯示
+            ret, frame = self.cap.read()
+            if ret:
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                height, width, channel = frame.shape
+                max_width, max_height = self.video_width, self.video_height
+                scale = min(max_width / width, max_height / height)
+                new_width, new_height = int(width * scale), int(height * scale)
+                frame = cv2.resize(
+                    frame, (new_width, new_height), interpolation=cv2.INTER_AREA
+                )
+                qimg = QImage(frame.data, new_width, new_height, QImage.Format_RGB888)
+                self.video_label.setPixmap(QPixmap.fromImage(qimg))
+
+                current_frame = int(self.cap.get(cv2.CAP_PROP_POS_FRAMES))
+                total_frames = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
+                self.slider.setValue(current_frame)
+                # print(total_frames, self.cap.get(cv2.CAP_PROP_FPS))
+                current_time = time.strftime(
+                    "%M:%S", time.gmtime(self.cap.get(cv2.CAP_PROP_POS_MSEC) / 1000)
+                )
+                total_time = time.strftime(
+                    "%M:%S", time.gmtime(total_frames / self.cap.get(cv2.CAP_PROP_FPS))
+                )
+                self.time_label.setText(f"{current_time} / {total_time}")
+            else:
+                self.timer.stop()
+
     def keyPressEvent(self, event):
         if self.video_path:
             current_time = self.cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
-            formatted_time = time.strftime('%M:%S', time.gmtime(current_time))
+            formatted_time = time.strftime("%M:%S", time.gmtime(current_time))
             # print(formatted_time == "00:00")
             if event.key() == Qt.Key_C and formatted_time != "00:00":
                 self.record_c_label.setText(f"Time: {formatted_time}")
                 self.controller.handle_key("C")
-                
+
             elif event.key() == Qt.Key_W and formatted_time != "00:00":
                 self.record_w_label.setText(f"Time: {formatted_time}")
                 self.controller.handle_key("W")
-                
-                
+
             elif event.key() == Qt.Key_R and formatted_time != "00:00":
                 self.record_r_label.setText(f"Time: {formatted_time}")
                 self.controller.handle_key("R")
-                
+
+            elif event.key() == Qt.Key_Space:
+                if self.start_name == "pause":
+                    self.togglePlay()
+                    self.start_name = "play"
+
+                elif self.start_name == "play":
+                    self.pause_video()
+                    self.start_name = "pause"
+
+            elif event.key() == Qt.Key_Right:
+                self.seek_relative(0.1)  # 快轉 0.2 秒
+
+            elif event.key() == Qt.Key_Left:
+                self.seek_relative(-0.1)  # 倒退 0.2 秒
+
+            event.accept()
 
     def clear_records(self):
         self.record_c_list.clear()
