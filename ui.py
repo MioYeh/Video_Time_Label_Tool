@@ -38,8 +38,9 @@ class VideoPlayer(QWidget):
         self.timer.timeout.connect(self.nextFrame)
         self.playback_rate = 1.0
         self.start_name = "pause"
-
+        self.version = "1.0.3"
         self.recording = False
+        self.save_check = True
         self.start_time = None
         self.start_times = {"C": None, "W": None, "R": None}
         self.screen = QApplication.desktop()
@@ -56,7 +57,7 @@ class VideoPlayer(QWidget):
             self.video_height = 720
 
         self.setWindowTitle("Video Player")
-        self.setGeometry(100, 100, self.video_width + 150, self.video_height + 80)
+        self.setGeometry(100, 100, self.video_width + 300, self.video_height + 50)
 
         self.video_label = QLabel(self)
         self.video_label.setStyleSheet("background-color: black;")
@@ -68,7 +69,7 @@ class VideoPlayer(QWidget):
         self.label_path_label.setWordWrap(True)
 
         self.play_button = QPushButton("Play", self)
-        self.play_button.clicked.connect(self.togglePlay)
+        self.play_button.clicked.connect(self.play_video)
 
         self.pause_button = QPushButton("Pause", self)
         self.pause_button.clicked.connect(self.pause_video)
@@ -119,11 +120,11 @@ class VideoPlayer(QWidget):
         self.record_r_list.setSelectionMode(QListWidget.SingleSelection)
 
         self.delete_c_record_btn = QPushButton("Delete Record", self)
-        self.delete_c_record_btn.clicked.connect(self.delete_c_selected_record)
+        self.delete_c_record_btn.clicked.connect(self.controller.delete_c_selected_record)
         self.delete_w_record_btn = QPushButton("Delete Record", self)
-        self.delete_w_record_btn.clicked.connect(self.delete_w_selected_record)
+        self.delete_w_record_btn.clicked.connect(self.controller.delete_w_selected_record)
         self.delete_r_record_btn = QPushButton("Delete Record", self)
-        self.delete_r_record_btn.clicked.connect(self.delete_r_selected_record)
+        self.delete_r_record_btn.clicked.connect(self.controller.delete_r_selected_record)
         # ---------------------------------
 
         self.record_area = QTextEdit()
@@ -132,7 +133,6 @@ class VideoPlayer(QWidget):
         self.record_scroll.setWidgetResizable(True)
         self.record_scroll.setWidget(self.record_area)
 
-        # 版面配置
         save_layout = QHBoxLayout()
         save_layout.addWidget(self.open_button)
         save_layout.addWidget(self.folder_button)
@@ -163,16 +163,8 @@ class VideoPlayer(QWidget):
         list_path_layout.addLayout(list_layout)
         list_path_layout.addWidget(self.video_label)
 
-        left_layout = QVBoxLayout()
-        left_layout.addLayout(list_path_layout)
-        left_layout.addLayout(path_layout)
-        left_layout.addLayout(save_layout)
-        left_layout.addLayout(slider_layout)
-        left_layout.addLayout(controls_layout)
-
         # ------------reocrd list------------
-        down_layout = QHBoxLayout()
-
+        down_layout = QVBoxLayout()
         down_layout_list_1 = QVBoxLayout()
         down_layout_list_1.addWidget(QLabel("C Records:"))
         down_layout_list_1.addWidget(self.record_c_label)
@@ -194,71 +186,94 @@ class VideoPlayer(QWidget):
         down_layout.addLayout(down_layout_list_1)
         down_layout.addLayout(down_layout_list_2)
         down_layout.addLayout(down_layout_list_3)
+        list_path_layout.addLayout(down_layout)
         # -----------------------------------
+        
+        main_layout = QVBoxLayout()
+        main_layout.addLayout(list_path_layout)
+        main_layout.addLayout(path_layout)
+        main_layout.addLayout(save_layout)
+        main_layout.addLayout(slider_layout)
+        main_layout.addLayout(controls_layout)
 
-        main_layout = QHBoxLayout()
-        main_layout.addLayout(left_layout)
-        main_layout.addLayout(down_layout)
         self.setFocusPolicy(Qt.StrongFocus)
         self.setLayout(main_layout)
 
+
+    def check_save(self):
+        if self.save_check == False:
+            reply = QMessageBox.question(self, "警告", "Label尚未存檔，是否繼續開啟新影片？",
+                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if reply == QMessageBox.No:
+                return
+            elif reply == QMessageBox.Yes:
+                self.save_check = True
+                return True
+        elif self.save_check == True:
+            return True
+             
+            
     def openFile(self):
-        file_path, _ = QFileDialog.getOpenFileName(
-            self, "Open Video File", "", "Video Files (*.mp4 *.avi *.mkv)"
-        )
-        if file_path:
-            self.loadVideo(file_path)
-            self.clear_records()
-            self.video_path_label.setText(f"Video Path: {file_path}")
-            json_path = os.path.splitext(self.video_path)[0] + ".json"
-            if os.path.exists(json_path) and os.path.isfile(json_path):
-                try:
-                    records = load_json(json_path)
-                    for item in records.get("C", []):
-                        self.record_c_list.addItem(item)
-                    for item in records.get("W", []):
-                        self.record_w_list.addItem(item)
-                    for item in records.get("R", []):
-                        self.record_r_list.addItem(item)
-                    self.label_path_label.setText(f"Label Path: {json_path}")
-                except Exception as e:
-                    self.label_path_label.setText("Label Path: Fail load label")
+        if self.check_save():
+            file_path, _ = QFileDialog.getOpenFileName(
+                self, "Open Video File", "", "Video Files (*.mp4 *.avi *.mkv)"
+            )
+            if file_path:
+                self.loadVideo(file_path)
+                self.controller.clear_records()
+                self.video_path_label.setText(f"Video Path: {file_path}")
+                json_path = os.path.splitext(self.video_path)[0] + ".json"
+                if os.path.exists(json_path) and os.path.isfile(json_path):
+                    try:
+                        records = load_json(json_path)
+                        for item in records.get("C", []):
+                            self.record_c_list.addItem(item)
+                        for item in records.get("W", []):
+                            self.record_w_list.addItem(item)
+                        for item in records.get("R", []):
+                            self.record_r_list.addItem(item)
+                        self.label_path_label.setText(f"Label Path: {json_path}")
+                    except Exception as e:
+                        self.label_path_label.setText("Label Path: Fail load label")
 
     def openFolder(self):
-        folder_path = QFileDialog.getExistingDirectory(self, "Open Folder")
-        if folder_path:
-            self.folder_path = folder_path
-            self.list_widget.clear()
-            video_files = [
-                f
-                for f in os.listdir(folder_path)
-                if os.path.isfile(os.path.join(folder_path, f))
-                and f.lower().endswith((".mp4", ".avi", ".mov"))
-            ]
-            for file in video_files:
-                self.list_widget.addItem(file)
+        if self.check_save():
+            folder_path = QFileDialog.getExistingDirectory(self, "Open Folder")
+            if folder_path:
+                self.folder_path = folder_path
+                self.list_widget.clear()
+                video_files = [
+                    f
+                    for f in os.listdir(folder_path)
+                    if os.path.isfile(os.path.join(folder_path, f))
+                    and f.lower().endswith((".mp4", ".avi", ".mov"))
+                ]
+                for file in video_files:
+                    self.list_widget.addItem(file)
 
     def loadSelectedVideo(self, item):
-        if hasattr(self, "folder_path") and self.folder_path:
-            file_path = os.path.join(self.folder_path, item.text())
-            self.clear_records()
-            self.loadVideo(file_path)
-            self.video_path_label.setText(f"Video Path: {file_path}")
-            json_path = os.path.splitext(self.video_path)[0] + ".json"
-            if os.path.exists(json_path) and os.path.isfile(json_path):
-                try:
-                    records = load_json(json_path)
-                    for item in records.get("C", []):
-                        self.record_c_list.addItem(item)
-                    for item in records.get("W", []):
-                        self.record_w_list.addItem(item)
-                    for item in records.get("R", []):
-                        self.record_r_list.addItem(item)
-                    self.label_path_label.setText(f"Label Path: {json_path}")
-                except Exception as e:
-                    self.label_path_label.setText("Label Path: Fail load label")
-            else:
-                self.label_path_label.setText("Label Path: No label selected")
+        if self.check_save():
+            print(self.save_check)
+            if hasattr(self, "folder_path") and self.folder_path:
+                file_path = os.path.join(self.folder_path, item.text())
+                self.controller.clear_records()
+                self.loadVideo(file_path)
+                self.video_path_label.setText(f"Video Path: {file_path}")
+                json_path = os.path.splitext(self.video_path)[0] + ".json"
+                if os.path.exists(json_path) and os.path.isfile(json_path):
+                    try:
+                        records = load_json(json_path)
+                        for item in records.get("C", []):
+                            self.record_c_list.addItem(item)
+                        for item in records.get("W", []):
+                            self.record_w_list.addItem(item)
+                        for item in records.get("R", []):
+                            self.record_r_list.addItem(item)
+                        self.label_path_label.setText(f"Label Path: {json_path}")
+                    except Exception as e:
+                        self.label_path_label.setText("Label Path: Fail load label")
+                else:
+                    self.label_path_label.setText("Label Path: No label selected")
 
     def loadVideo(self, path):
         if self.cap:
@@ -273,7 +288,7 @@ class VideoPlayer(QWidget):
             self.timer.start(30)
             self.timer.stop()
 
-    def togglePlay(self):
+    def play_video(self):
         if self.cap and self.cap.isOpened():
             self.paused = not self.paused
             if self.cap:
@@ -293,6 +308,18 @@ class VideoPlayer(QWidget):
             self.video_label.clear()
             self.play_button.setEnabled(True)
 
+    def speed_up(self):
+        self.playback_rate = min(4.0, self.playback_rate + 0.25)
+        self.update_timer_interval()
+
+    def original_speed(self):
+        self.playback_rate = 1.0
+        self.update_timer_interval()
+
+    def slow_down(self):
+        self.playback_rate = max(0.25, self.playback_rate - 0.25)
+        self.update_timer_interval()
+        
     def nextFrame(self):
         ret, frame = self.cap.read()
         if ret:
@@ -329,26 +356,11 @@ class VideoPlayer(QWidget):
         delay = max(1, int(1000 / (self.frame_rate * self.playback_rate)))
         self.timer.setInterval(delay)
 
-    def speed_up(self):
-        self.playback_rate = min(4.0, self.playback_rate + 0.25)
-        self.update_timer_interval()
-
-    def original_speed(self):
-        self.playback_rate = 1.0
-        self.update_timer_interval()
-
-    def slow_down(self):
-        self.playback_rate = max(0.25, self.playback_rate - 0.25)
-        self.update_timer_interval()
-
     def seek_relative(self, seconds):
         if self.cap and self.cap.isOpened():
             current_time_ms = self.cap.get(cv2.CAP_PROP_POS_MSEC)
             new_time_ms = max(0, current_time_ms + seconds * 1000)
             self.cap.set(cv2.CAP_PROP_POS_MSEC, new_time_ms)
-            # print(f"跳轉至：{new_time_ms / 1000:.2f} 秒")
-
-            # 播放前先讀出該時間點畫面顯示
             ret, frame = self.cap.read()
             if ret:
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -365,7 +377,6 @@ class VideoPlayer(QWidget):
                 current_frame = int(self.cap.get(cv2.CAP_PROP_POS_FRAMES))
                 total_frames = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
                 self.slider.setValue(current_frame)
-                # print(total_frames, self.cap.get(cv2.CAP_PROP_FPS))
                 current_time = time.strftime(
                     "%M:%S", time.gmtime(self.cap.get(cv2.CAP_PROP_POS_MSEC) / 1000)
                 )
@@ -380,22 +391,24 @@ class VideoPlayer(QWidget):
         if self.video_path:
             current_time = self.cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
             formatted_time = time.strftime("%M:%S", time.gmtime(current_time))
-            # print(formatted_time == "00:00")
             if event.key() == Qt.Key_C and formatted_time != "00:00":
+                self.save_check = False
                 self.record_c_label.setText(f"Time: {formatted_time}")
                 self.controller.handle_key("C")
 
             elif event.key() == Qt.Key_W and formatted_time != "00:00":
+                self.save_check = False
                 self.record_w_label.setText(f"Time: {formatted_time}")
                 self.controller.handle_key("W")
 
             elif event.key() == Qt.Key_R and formatted_time != "00:00":
+                self.save_check = False
                 self.record_r_label.setText(f"Time: {formatted_time}")
                 self.controller.handle_key("R")
 
             elif event.key() == Qt.Key_Space:
                 if self.start_name == "pause":
-                    self.togglePlay()
+                    self.play_video()
                     self.start_name = "play"
 
                 elif self.start_name == "play":
@@ -403,32 +416,13 @@ class VideoPlayer(QWidget):
                     self.start_name = "pause"
 
             elif event.key() == Qt.Key_Right:
-                self.seek_relative(0.1)  # 快轉 0.2 秒
+                self.seek_relative(0.1)  # 快轉 0.1 秒
 
             elif event.key() == Qt.Key_Left:
-                self.seek_relative(-0.1)  # 倒退 0.2 秒
+                self.seek_relative(-0.1)  # 倒退 0.1 秒
 
             event.accept()
 
-    def clear_records(self):
-        self.record_c_list.clear()
-        self.record_w_list.clear()
-        self.record_r_list.clear()
-
-    def delete_c_selected_record(self):
-        selected_items = self.record_c_list.selectedItems()
-        for item in selected_items:
-            self.record_c_list.takeItem(self.record_c_list.row(item))
-
-    def delete_w_selected_record(self):
-        selected_items = self.record_w_list.selectedItems()
-        for item in selected_items:
-            self.record_w_list.takeItem(self.record_w_list.row(item))
-
-    def delete_r_selected_record(self):
-        selected_items = self.record_r_list.selectedItems()
-        for item in selected_items:
-            self.record_r_list.takeItem(self.record_r_list.row(item))
 
     def save_records(self):
         if not self.video_path:
@@ -437,7 +431,7 @@ class VideoPlayer(QWidget):
         file_path = os.path.splitext(self.video_path)[0] + ".json"
         records = {
             "video_path": self.video_path,
-            "version": "1.0.2",
+            "version": self.version,
             "C": [
                 self.record_c_list.item(i).text()
                 for i in range(self.record_c_list.count())
@@ -452,7 +446,9 @@ class VideoPlayer(QWidget):
             ],
         }
         save_json(file_path, records)
+        self.save_check = True
         QMessageBox.information(self, "成功", f"紀錄已儲存至 {file_path}")
+
 
     def load_records(self):
         if not self.video_path:
