@@ -56,7 +56,7 @@ class VideoPlayer(QWidget):
             self.video_width = 960
             self.video_height = 720
 
-        self.setWindowTitle("Video Player")
+        self.setWindowTitle("Video Time Label Tool")
         self.setGeometry(100, 100, self.video_width + 300, self.video_height + 50)
 
         self.video_label = QLabel(self)
