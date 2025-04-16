@@ -33,7 +33,7 @@ python main.py
 ```
 
 ## How to Use
-![image](https://github.com/MioYeh/GM-Label-Tool/blob/main/label_ui.png)
+![image](https://github.com/MioYeh/GM-Label-Tool/blob/main/ui(1.0.3).png)
 
 `讀取紀錄`
 
