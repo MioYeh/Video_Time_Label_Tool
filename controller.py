@@ -33,3 +33,23 @@ class VideoController:
             #     self.view.record_r_list.addItem(QListWidgetItem(record_text))
             #     self.view.record_r_label.setText(f"Time: ")
             self.recording = False
+            
+    def delete_c_selected_record(self):
+        selected_items = self.view.record_c_list.selectedItems()
+        for item in selected_items:
+            self.view.record_c_list.takeItem(self.view.record_c_list.row(item))
+
+    def delete_w_selected_record(self):
+        selected_items = self.view.record_w_list.selectedItems()
+        for item in selected_items:
+            self.view.record_w_list.takeItem(self.view.record_w_list.row(item))
+
+    def delete_r_selected_record(self):
+        selected_items = self.view.record_r_list.selectedItems()
+        for item in selected_items:
+            self.view.record_r_list.takeItem(self.view.record_r_list.row(item))
+            
+    def clear_records(self):
+        self.view.record_c_list.clear()
+        self.view.record_w_list.clear()
+        self.view.record_r_list.clear()
