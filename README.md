@@ -2,7 +2,7 @@
 
 #### 🎉 2025.04 video time label tool online.(verison 1.0.1)
 #### 🎉 2025.04.15 update new button, and change ui setup.(verison 1.0.2)
-#### 🎉 2025.04.15 there have some bug need debug, and change ui setup.(verison 1.0.3)
+#### 🎉 2025.04.16 there have some bug need debug, and change ui setup.(verison 1.0.3)
 ## Git Clone in your computers
 ```
 git clone https://github.com/MioYeh/GM-Label-Tool.git
