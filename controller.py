@@ -5,7 +5,10 @@ from PyQt5.QtWidgets import QListWidgetItem
 class VideoController:
     def __init__(self, view):
         self.view = view
-        self.recording = False
+        self.recording_c = False
+        self.recording_w = False
+        self.recording_r = False
+
         self.start_time = None
 
     def formatTime(self, seconds):
@@ -18,28 +21,37 @@ class VideoController:
     def handle_key(self, key):
         current_time = self.view.cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
         formatted_time = self.formatTime(round(current_time, 3))
-        if not self.recording:
-            self.start_time = formatted_time
-            self.recording = True
-        else:
-            record_text = f"{self.start_time} - {formatted_time}"
-            if key == 'C':
+
+        if key == 'C':
+            if not self.recording_c:
+                self.start_time_c = formatted_time
+                self.recording_c = True 
+            else:
+                record_text = f"{self.start_time_c} - {formatted_time}"
                 self.view.record_c_list.addItem(QListWidgetItem(record_text))
                 self.view.record_c_label.setText(f"Time: ")
-            elif key == 'W':
+                self.recording_c = False
+                 
+        if key == 'W':
+            if not self.recording_w:
+                self.start_time_w = formatted_time
+                self.recording_w = True 
+            else:
+                record_text = f"{self.start_time_w} - {formatted_time}"
                 self.view.record_w_list.addItem(QListWidgetItem(record_text))
                 self.view.record_w_label.setText(f"Time: ")
-            elif key == 'R':
+                self.recording_w = False 
+            
+        if key == 'R':
+            if not self.recording_r:
+                self.start_time_r = formatted_time
+                self.recording_r = True 
+            else:
+                record_text = f"{self.start_time_r} - {formatted_time}"
                 self.view.record_r_list.addItem(QListWidgetItem(record_text))
                 self.view.record_r_label.setText(f"Time: ")
-                
-            # elif key == 'R':
-            #     self.view.record_r_list.addItem(QListWidgetItem(record_text))
-            #     self.view.record_r_label.setText(f"Time: ")
-            # elif key == 'R':
-            #     self.view.record_r_list.addItem(QListWidgetItem(record_text))
-            #     self.view.record_r_label.setText(f"Time: ")
-            self.recording = False
+                self.recording_r = False
+
             
     def delete_c_selected_record(self):
         selected_items = self.view.record_c_list.selectedItems()
