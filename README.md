@@ -4,6 +4,7 @@
 #### 🎉 2025.04.15 Update new button, and change ui setup.(verison 1.0.2)
 #### 🎉 2025.04.16 There have some bug need debug, and change ui setup.(verison 1.0.3)
 #### 🎉 2025.04.17 Add previous/next video buttons and timestamp jump on label selection.(verison 1.0.4)
+#### 🎉 2025.04.29 There have some bug need debug.(verison 1.0.5)
 
 ## Git Clone in your computers
 ```
