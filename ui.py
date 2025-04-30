@@ -42,7 +42,7 @@ class VideoPlayer(QWidget):
         self.timer.timeout.connect(self.nextFrame)
         self.playback_rate = 1.0
         self.start_name = "pause"
-        self.version = "1.0.4"
+        self.version = "1.0.5"
         self.recording = False
         self.save_check = True
         self.start_time = None
